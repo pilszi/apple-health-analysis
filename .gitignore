@@ -1,0 +1,11 @@
+# Python
+.venv/
+__pycache__/
+*.pyc
+
+# Apple Health data
+static/data/apple_health_export/
+data/
+
+# VSCode
+.vscode/
