@@ -15,7 +15,11 @@ df_workout_hr["is_weekend"] = (
     int
 )  # 주말이면 1, 평일이면 0 (이진형)
 
-df_workout_hr["TotalEnergyBurned"] = df_workout_hr["ActiveEnergyBurned"] + df_workout_hr["BasalEnergyBurned"]
+df_workout_hr["TotalEnergyBurned"] = (df_workout_hr["ActiveEnergyBurned"] + df_workout_hr["BasalEnergyBurned"])
+df_workout_hr['heart_rate_range'] = (df_workout_hr['workout_max_hr'] - df_workout_hr['workout_min_hr'])
+df_workout_hr['hr_avg_ratio'] = (df_workout_hr['workout_avg_hr']/df_workout_hr['workout_max_hr'])
+df_workout_hr["duration/hr"] = (df_workout_hr["duration"] * df_workout_hr["workout_avg_hr"])
+
 # 3. 분석 및 원-핫 인코딩 단계에서 제외할 컬럼 정의
 drop_cols = ["startDate", "endDate", "ActiveEnergyBurned", "BasalEnergyBurned"]
 df_workout_hr = df_workout_hr.drop(columns=drop_cols, errors="ignore")
