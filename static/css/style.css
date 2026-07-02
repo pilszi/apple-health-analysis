@@ -1,0 +1,119 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background: #f5f6fb;
+}
+
+.dashboard {
+    display: flex;
+}
+
+/* 왼쪽 메뉴 */
+.sidebar {
+    width: 230px;
+    height: 100vh;
+    background: white;
+    border-right: 1px solid #eee;
+    padding: 25px 15px;
+    position: fixed;
+}
+
+.logo {
+    font-size: 22px;
+    font-weight: bold;
+    margin-bottom: 35px;
+    text-align: center;
+}
+
+.sidebar ul {
+    list-style: none;
+}
+
+.sidebar li {
+    margin-bottom: 10px;
+}
+
+.sidebar a {
+    display: block;
+    padding: 13px 18px;
+    color: #333;
+    text-decoration: none;
+    border-radius: 8px;
+    font-weight: bold;
+}
+
+.sidebar a:hover,
+.sidebar .active a {
+    background: #6c63ff;
+    color: white;
+}
+
+/* 메인 */
+.main {
+    margin-left: 230px;
+    width: calc(100% - 230px);
+    padding: 25px;
+}
+
+.top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+/* 상단 카드 */
+.summary {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 15px;
+    margin-bottom: 15px;
+}
+
+.summary-card {
+    background: white;
+    padding: 22px;
+    border-radius: 6px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    color: #555;
+}
+
+.summary-card strong {
+    display: block;
+    margin-top: 15px;
+    font-size: 24px;
+    color: #111;
+} 
+
+/* 차트 영역 */
+.content-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 15px;
+}
+
+.box {
+    background: white;
+    padding: 18px;
+    border-radius: 6px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.box h3 {
+    margin-bottom: 15px;
+    font-size: 16px;
+}
+
+.wide {
+    min-height: 300px;
+}
+
+canvas {
+    width: 100% !important;
+    height: 260px !important;
+}

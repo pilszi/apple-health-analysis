@@ -1,0 +1,36 @@
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title></title>
+        <link rel='icon' href='icon.png'>
+        <script src='https://code.jquery.com/jquery-3.3.1.min.js'>W</script>
+        <script src='https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js'></script>
+        <style>
+        
+        </style>
+    </head>
+    <body>
+        <body>
+    <button onclick="runPythonScript()">스크립트 실행하기</button>
+    <label id="label"></label>
+
+    <script>
+        function runPythonScript() {
+            // Flask 서버로 새로고침 없이 POST 요청을 보냅니다.
+            fetch('/trigger-convert')
+            .then(response => response.json())
+            .then(data => {
+                $("#label").html("변환 성공") 
+                // document.getElementById("label").innerText = "변환 성공"
+            })
+            .catch(error => {
+                console.error('에러 발생:', error);
+            });
+        }
+    </script>
+</body>
+    </body>
+    <script>
+        
+    </script>
+</html>
