@@ -1,6 +1,6 @@
 import pandas as pd
 
-def preprocessing(file):
+def PreProcess(file):
     """
         csv 파일 전처리 함수
 

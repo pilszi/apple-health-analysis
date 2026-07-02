@@ -1,22 +1,24 @@
 import xml.etree.ElementTree as ET
 import pandas as pd
 
+# Apple Watch Health data 중 필요한 data 만 정제
+
 file_path = "./static/data/apple_health_export/export.xml"
 
 target_source = "정원필의 Apple Watch"
 
-summaries = []
 workouts = []
 heart_rates = []
 
-print(f"⏳ [{target_source}] 데이터만 필터링하여 스캔 시작...")
+print(f"⏳ [Apple Watch] 데이터만 필터링하여 스캔 시작...")
 context = ET.iterparse(file_path, events=("end",))
 
 for event, elem in context:
 
     # 1. 운동 세션 추출 (지정한 애플워치 기록만)
     if elem.tag == "Workout":
-        if elem.attrib.get("sourceName") == target_source:
+        if "Apple Watch" in elem.attrib.get("sourceName"):
+        # if elem.attrib.get("sourceName") == target_source:
             workout_data = dict(elem.attrib)
             
             # 자식 요소(MetadataEntry)들을 순회하면서 HKAverageMETs 검색
@@ -50,7 +52,7 @@ for event, elem in context:
         
     # 2. 상세 기록 추출 (지정한 애플워치 기록 + 심박수만)
     elif elem.tag == "Record":
-        if (elem.attrib.get("sourceName") == target_source and 
+        if ("Apple Watch" in elem.attrib.get("sourceName") and 
             elem.attrib.get("type") == "HKQuantityTypeIdentifierHeartRate"):
             # print("=== HeartRate 발견 ===")
             # 후속 조인(Join)과 시각화를 위해 타임스탬프와 심박수 값만 정제해서 보관
