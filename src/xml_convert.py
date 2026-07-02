@@ -68,10 +68,8 @@ for event, elem in context:
 df_workout = pd.DataFrame(workouts)
 df_hr = pd.DataFrame(heart_rates)
 
-# 데이터프레임 별 불필요한 컬럼 제거
-workout_cols = ["sourceName", "sourceVersion", "device", "durationUnit"]
+workout_cols = ["sourceName", "sourceVersion", "device", "durationUnit", "creationDate"]
 hr_cols = ["sourceName"]
-
 
 # 2. 운동 세션 정제 (타임존 정보가 포함된 시간을 판다스 시간 객체로 변환)
 if not df_workout.empty:
@@ -82,7 +80,9 @@ if not df_workout.empty:
     df_workout["workoutActivityType"] = df_workout[
         "workoutActivityType"
     ].str.replace("HKWorkoutActivityType", "", regex=False)
-
+    # workoutActivityType 컬럼 값 불필요한 반복 단어 제거
+    df_workout["workoutActivityType"] = df_workout["workoutActivityType"].str.replace("HKWorkoutActivityType", "", regex=False)
+    # 데이터프레임 별 불필요한 컬럼 제거
     df_workout_dr = df_workout.drop(columns=workout_cols, errors='ignore')
     print("=== Workout ===")
 

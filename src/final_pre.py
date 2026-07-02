@@ -54,21 +54,5 @@ df_workout_final_mart = pd.merge(
     how='left'
 ).drop(columns=['workout_idx']) # 임시 키 제거
 
-df_workout_final_mart["workoutActivityType"] = df_workout_final_mart[
-        "workoutActivityType"
-    ].str.replace("HKWorkoutActivityType", "", regex=False)
-
 df_workout_final_mart.to_csv(f"{file_path}/workout_hr.csv", index=False, encoding="utf-8-sig")
 print('==== 최종 데이터 완성 ====')
-
-
-
-
-# print(set_worktype)
-
-# """
-# 'HKWorkoutActivityTypeBowling', 'HKWorkoutActivityTypeCooldown', 'HKWorkoutActivityTypeBasketball', 'HKWorkoutActivityTypeStairs',
-# 'HKWorkoutActivityTypeCycling', 'HKWorkoutActivityTypeCoreTraining', 'HKWorkoutActivityTypeRunning', 'HKWorkoutActivityTypeTraditionalStrengthTraining',
-# 'HKWorkoutActivityTypeWalking'
-
-# """
