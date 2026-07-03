@@ -6,6 +6,9 @@ __pycache__/
 # Apple Health data
 static/data/apple_health_export/
 data/
+static/img
 
 # VSCode
 .vscode/
+
+test.py
