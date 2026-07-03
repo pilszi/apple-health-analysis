@@ -1,22 +1,62 @@
 from fastapi import FastAPI
-from pydantic import BaseModel
-import subprocess
-import os
 
-from main import hello
+from src.preprocessing import PreProcess
+from src.xml_convert import convert_xml
+from src.final_pre import pre_ml_data
+from src.corr import correlation_df
+from src.train_test import encoder, ml_train_test_split, ml_train
+from src.predict import predict_calories, model_5, cols, encoder, model_7
 
 app = FastAPI()
 
-class TaskModel(BaseModel):
-    task: str
 
-@app.get("/run-script")
+
+@app.get("/convert")
 def run_script():
-    
-    try:
-        result = hello()
-        # 스크립트가 print() 등으로 출력한 결과물(stdout)을 반환
-        return {"result": f"스크립트 실행 성공! 출력 결과: {result}"}
-    
-    except subprocess.CalledProcessError as e:
-        return {"result": f"스크립트 실행 실패: {e.stderr.strip()}"}
+    result = convert_xml()
+    return {"result": result}
+
+
+@app.get("/prepress")
+def prepress():
+    """
+        csv 파일 전처리 요청
+        (결측치, 중복값, 불필요한 데이터 삭제)
+    """
+    result = PreProcess()
+    return {"result": result}
+
+
+@app.get("/final_pre")
+def final_pre():
+    """
+        머신러닝 학습을 위한 데이터 최종 정리
+    """
+    result = pre_ml_data()
+    return {"result": result}
+
+@app.get("/corr")
+def correlation():
+    """
+        데이터들 간에 상관관계 분석 요청
+    """
+    result = correlation_df()
+    return {"result": result}
+
+@app.get("/ml_train")
+def train():
+    """
+        머신러닝 학습 요청
+    """
+    x_train, x_test, y_train, y_test = ml_train_test_split(encoder=encoder)
+    result = ml_train(x_train=x_train, x_test=x_test, y_train=y_train, y_test=y_test)
+    return {"result": result}
+
+
+@app.post("/predict")
+def predict(data:dict):
+    """
+        학습된 모델에 데이터 예측
+    """
+    result = predict_calories(avg_hr=data["avg_hr"], workout=data["workout"], duration=data["duration"], model=model_5, cols=cols, encoder=encoder)
+    return {"result": result}

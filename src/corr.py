@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 
 def correlation_df():
     file_path = f'./static/data/apple_health_export'
+    result = 0
     try:
         df = pd.read_csv(f'{file_path}/workout_hr.csv')
       
@@ -28,7 +29,9 @@ def correlation_df():
         corr.to_csv(f"{file_path}/work_hr_corr.csv")
         plt.savefig(f"./static/img/work_hr_corr.png", dpi=300, bbox_inches="tight")
         print(" ==== Correlation 완성 ==== ")
+        result = 1
     except FileNotFoundError as f:
         print(f"파일을 찾지 못했습니다 : {f}")
     except Exception as e:
         print(f"기타 에러 발생 : {e}")
+    return result

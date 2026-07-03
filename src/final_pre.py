@@ -1,8 +1,11 @@
 import pandas as pd
 
 def pre_ml_data():
+    """
+        머신러닝 학습을 위한 데이터 컬럼 정리
+    """
     file_path = f'./static/data/apple_health_export'
-
+    result = 0
     try:
         df_workout = pd.read_csv(f'{file_path}/workout_final.csv')
         df_hr = pd.read_csv(f'{file_path}/hr_final.csv')
@@ -82,7 +85,9 @@ def pre_ml_data():
 
         df_workout_hr_merge.to_csv(f"{file_path}/workout_hr.csv", index=False, encoding="utf-8-sig")
         print('==== 최종 데이터 완성 ====')
+        result = 1
     except FileNotFoundError as f:
         print(f"파일을 찾지 못했습니다 : {f}")
     except Exception as e:
         print(f"기타 에러 발생 : {e}")
+    return result

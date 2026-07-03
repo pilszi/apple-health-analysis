@@ -7,6 +7,7 @@ def PreProcess():
 
     """
     file_path = f'./static/data/apple_health_export'
+    result = 0
     try:
         df_workout = pd.read_csv(f"{file_path}/workout.csv")
         df_hr = pd.read_csv(f"{file_path}/hr.csv")
@@ -32,7 +33,9 @@ def PreProcess():
             print(df.head())
             df.to_csv(f'./static/data/apple_health_export/{filename}_pre.csv', index=False, encoding="utf-8-sig")
             print(f"==== {filename}_pre.csv 생성 ====")
+            result = 1
     except FileNotFoundError as f:
         print(f"파일을 찾지 못했습니다 : {f}")
     except Exception as e:
         print(f"기타 에러 발생 : {e}")
+    return result
