@@ -8,9 +8,9 @@ import matplotlib.pyplot as plt
 from sklearn.metrics import mean_absolute_error
 import joblib
 
-encoder = OneHotEncoder(drop='first', handle_unknown='ignore', sparse_output=False)
 
-def ml_train_test_split(encoder):
+def ml_train_test_split():
+    encoder = OneHotEncoder(drop='first', handle_unknown='ignore', sparse_output=False)
 
     file_path = f'./static/data/apple_health_export'
     df = pd.read_csv(f'{file_path}/workout_hr.csv')
@@ -49,6 +49,7 @@ def ml_train_test_split(encoder):
     # encoder, 머신러닝 학습 컬럼 순서 저장
     joblib.dump(encoder, './static/model/encoder.pkl')
     joblib.dump(x_train_final.columns.to_list(), './static/model/apple_health_cols.pkl')
+    print(" ==== 학습 데이터 분리 완료 ==== ")
     
     return [x_train_final, x_test_final, y_train, y_test]
 
@@ -120,6 +121,7 @@ def ml_train(x_train, x_test, y_train, y_test):
         except Exception as e:
             print(f"에러 발생 : {e}")
         res = 1
+        print(" ==== 모델 학습 완료 ==== ")
     except Exception as e:
         print(f" ==== 에러 발생 : {e} ==== ")
 

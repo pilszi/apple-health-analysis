@@ -45,9 +45,11 @@ def pre_ml_data():
                     'workout_min_hr': None
                 })
 
+        df_workout_hr_mapped = pd.DataFrame(workout_hr_summary)
+
         df_hr["startDate"] = pd.to_datetime(df_workout["startDate"])
 
-        # 2. 파생 변수 생성 (차원을 늘리지 않는 방식)
+        # 2. 파생 변수 생성 (운동 시작 시간, 주말/평일 구분)
         df_hr["start_hour"] = df_hr["startDate"].dt.hour  # 0 ~ 23시 (수치형)
         df_hr["is_weekend"] = (
             df_hr["startDate"].dt.weekday >= 5
@@ -61,8 +63,11 @@ def pre_ml_data():
         valid_types = value[value >= 20].index
         df_workout_ = df_workout[df_workout["workoutActivityType"].isin(valid_types)]
         # print(workout_hr_summary)
-        df_workout_hr_mapped = pd.DataFrame(workout_hr_summary)
-        # print(df_wh.head())
+
+        # 5. doration < 20 인 데이터 제거(운동시간 20분 이상인 데이터만 취급)
+        min_value = df_workout_["duration"] >= 20
+        df_workout_ = df_workout_[min_value]
+        
 
         # 6. 원본 운동 세션 테이블과 고유 인덱스 기준으로 결합 (Merge)
         df_workout_hr_merge = pd.merge(
@@ -88,6 +93,9 @@ def pre_ml_data():
         result = 1
     except FileNotFoundError as f:
         print(f"파일을 찾지 못했습니다 : {f}")
+    except KeyError as k:
+        print(f"key 에러 발생 : {k}")
     except Exception as e:
         print(f"기타 에러 발생 : {e}")
     return result
+

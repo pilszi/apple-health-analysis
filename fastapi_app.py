@@ -4,7 +4,7 @@ from src.preprocessing import PreProcess
 from src.xml_convert import convert_xml
 from src.final_pre import pre_ml_data
 from src.corr import correlation_df
-from src.train_test import encoder, ml_train_test_split, ml_train
+from src.train_test import ml_train_test_split, ml_train
 from src.predict import predict_calories, model_5, cols, encoder, model_7
 
 app = FastAPI()
@@ -17,8 +17,8 @@ def run_script():
     return {"result": result}
 
 
-@app.get("/prepress")
-def prepress():
+@app.get("/preprocess")
+def preprocess():
     """
         csv 파일 전처리 요청
         (결측치, 중복값, 불필요한 데이터 삭제)
@@ -43,12 +43,13 @@ def correlation():
     result = correlation_df()
     return {"result": result}
 
+
 @app.get("/ml_train")
 def train():
     """
         머신러닝 학습 요청
     """
-    x_train, x_test, y_train, y_test = ml_train_test_split(encoder=encoder)
+    x_train, x_test, y_train, y_test = ml_train_test_split()
     result = ml_train(x_train=x_train, x_test=x_test, y_train=y_train, y_test=y_test)
     return {"result": result}
 
