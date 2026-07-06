@@ -5,7 +5,7 @@ from src.xml_convert import convert_xml
 from src.final_pre import pre_ml_data
 from src.corr import correlation_df
 from src.train_test import ml_train_test_split, ml_train
-from src.predict import predict_calories, model_5, cols, encoder, model_7
+from src.predict import predict_calories, model_5, cols, encoder
 
 app = FastAPI()
 

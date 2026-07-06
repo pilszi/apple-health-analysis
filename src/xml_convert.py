@@ -2,15 +2,15 @@ import xml.etree.ElementTree as ET
 import pandas as pd
 
 # Apple Watch Health data 중 필요한 data 만 정제
-file_path = "./static/data/apple_health_export/export.xml"
-workouts = []
-heart_rates = []
-result = 0
 
 def convert_xml():
     """
         xml 파일에서 특정 attrib 만 추출하여 csv 파일로 저장하는 함수
     """
+    file_path = "./static/data/apple_health_export/export.xml"
+    workouts = []
+    heart_rates = []
+    result = 0  
     try:
         context = ET.iterparse(file_path, events=("end",))
         print(f"⏳ [Apple Watch] 데이터만 필터링하여 스캔 시작...")
@@ -45,24 +45,44 @@ def convert_xml():
                                         workout_data["BasalEnergyBurned"] = float(sum_value)
                                     except ValueError:
                                         workout_data["BasalEnergyBurned"] = sum_value
+                        elif child.tag == "MetadataEntry":
+                            meta_key = child.attrib.get("key")
+                            if meta_key == "HKWeatherTemperature":
+                                key_value = child.attrib.get("value")
+                                if key_value:
+                                    # workout_data["Temperature"] = float(key_value)
+                                    workout_data['Temperature'] = workout_data['Temperature'].astype(str).str.replace(r'[^-0-9.]', '', regex=True)
+                                else:
+                                    # workout_data['Temperature'] = float(workout_data['Temperature']).interpolate(method='linear')
+                                    workout_data['Temperature'] = ""
+
+                            elif meta_key ==  "HKWeatherHumidity":
+                                key_value = child.attrib.get("value")
+                                if key_value:
+                                    # workout_data["Humidity"] = float(key_value)
+                                    workout_data['Humidity'] = workout_data['Humidity'].astype(str).str.replace(r'[^-0-9.]', '', regex=True)
+                                else:
+                                    #  workout_data['Humidity'] = float(workout_data['Humidity']).interpolate(method='linear')
+                                     workout_data['Humidity'] = ""
                     
                     # 가공된 딕셔너리를 기존 바구니에 담기
                     workouts.append(workout_data)
-                # print("=== Workout 발견 ===")
                 elem.clear()
-                
+                # print("=== Workout 발견 ===")
+
             # 2. 상세 기록 추출 (지정한 애플워치 기록 + 심박수만)
             elif elem.tag == "Record":
                 if ("Apple Watch" in elem.attrib.get("sourceName") and 
                     elem.attrib.get("type") == "HKQuantityTypeIdentifierHeartRate"):
-                    # print("=== HeartRate 발견 ===")
                     # 후속 조인(Join)과 시각화를 위해 타임스탬프와 심박수 값만 정제해서 보관
                     heart_rates.append({
                         'heart_rate': float(elem.attrib.get('value')),
                         'timestamp': elem.attrib.get('startDate'),
                         'sourceName': elem.attrib.get('sourceName') # 확인용
-                    })        
+                    })
+        
                 # 메모리 해제
+                    # print("=== HeartRate 발견 ===")
                 elem.clear()
 
         # 데이터프레임 변환
@@ -86,6 +106,7 @@ def convert_xml():
             # 데이터프레임 별 불필요한 컬럼 제거
             df_workout_dr = df_workout.drop(columns=workout_cols, errors='ignore')
             print("=== Workout ===")
+            df_workout_dr.to_csv("./static/data/apple_health_export/workout.csv", index=False, encoding="utf-8-sig")
 
         # 3. 상세 심박수 정제
         if not df_hr.empty:
@@ -93,9 +114,7 @@ def convert_xml():
             df_hr['date'] = df_hr['timestamp'].dt.date
             df_hr_dr = df_hr.drop(columns=hr_cols, errors='ignore')
             print("=== HeartRate ===")
-
-        df_workout_dr.to_csv("./static/data/apple_health_export/workout.csv", index=False, encoding="utf-8-sig")
-        df_hr_dr.to_csv("./static/data/apple_health_export/hr.csv", index=False, encoding="utf-8-sig")
+            df_hr_dr.to_csv("./static/data/apple_health_export/hr.csv", index=False, encoding="utf-8-sig")
         
         result = 1
 
@@ -103,8 +122,8 @@ def convert_xml():
         print(f"Workout 행수: {len(df_workout)} | HR 행수: {len(df_hr)}")
     except FileNotFoundError as f:
         print(f"파일을 찾지 못했습니다 : {f}")
-    except Exception as e:
-        print(f"기타 에러 발생 : {e}")
+    # except Exception as e:
+    #     print(f"기타 에러 발생 : {e}")
 
     return {"result": result}
 

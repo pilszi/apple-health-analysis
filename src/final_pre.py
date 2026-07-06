@@ -7,8 +7,8 @@ def pre_ml_data():
     file_path = f'./static/data/apple_health_export'
     result = 0
     try:
-        df_workout = pd.read_csv(f'{file_path}/workout_final.csv')
-        df_hr = pd.read_csv(f'{file_path}/hr_final.csv')
+        df_workout = pd.read_csv(f'{file_path}/workout_pre.csv')
+        df_hr = pd.read_csv(f'{file_path}/hr_pre.csv')
 
         # print(df_workout.head())
         # print(df_hr.head())
@@ -50,8 +50,8 @@ def pre_ml_data():
         df_hr["startDate"] = pd.to_datetime(df_workout["startDate"])
 
         # 2. 파생 변수 생성 (운동 시작 시간, 주말/평일 구분)
-        df_hr["start_hour"] = df_hr["startDate"].dt.hour  # 0 ~ 23시 (수치형)
-        df_hr["is_weekend"] = (
+        df_workout_hr_mapped["start_hour"] = df_hr["startDate"].dt.hour  # 0 ~ 23시 (수치형)
+        df_workout_hr_mapped["is_weekend"] = (
             df_hr["startDate"].dt.weekday >= 5
         ).astype(  # 5, 6이 토, 일요일
             int
