@@ -11,4 +11,4 @@ static/img
 # VSCode
 .vscode/
 
-test.py
+test/
