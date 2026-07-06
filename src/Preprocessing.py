@@ -11,6 +11,8 @@ def PreProcess():
     try:
         df_workout = pd.read_csv(f"{file_path}/workout.csv")
         df_hr = pd.read_csv(f"{file_path}/hr.csv")
+        # 이상치 제거
+        df_workout = df_workout[df_workout["BasalEnergyBurned"] < 2000]
         df_li = [(df_workout, "workout"), (df_hr, "hr")]
         for df, filename in df_li:
             print(f'{df.head()}')
@@ -28,12 +30,12 @@ def PreProcess():
             print("="*60)
 
             # 모든 데이터 날짜 맞추기
-            print(f"2026-5-15 이전 데이터 수 = {len(df[df['date'] < '2021-05-15'])}")
+            print(f"2021-5-15 이전 데이터 수 = {len(df[df['date'] < '2021-05-15'])}")
             df = df[df["date"] >= "2021-05-15"]
             print(df.head())
             df.to_csv(f'./static/data/apple_health_export/{filename}_pre.csv', index=False, encoding="utf-8-sig")
             print(f"==== {filename}_pre.csv 생성 ====")
-            result = 1
+        result = 1
     except FileNotFoundError as f:
         print(f"파일을 찾지 못했습니다 : {f}")
     except Exception as e:
