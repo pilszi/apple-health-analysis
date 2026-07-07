@@ -77,14 +77,21 @@ def convert_xml():
                     # 후속 조인(Join)과 시각화를 위해 타임스탬프와 심박수 값만 정제해서 보관
                     heart_rates.append({
                         'heart_rate': float(elem.attrib.get('value')),
-                        'timestamp': elem.attrib.get('startDate'),
+                        'startDate': elem.attrib.get('startDate'),
                         'sourceName': elem.attrib.get('sourceName') # 확인용
                     })
         
                 # 메모리 해제
                     # print("=== HeartRate 발견 ===")
                 elem.clear()
+    except FileNotFoundError as f:
+        print(f"파일을 찾지 못했습니다 : {f}")
+    except KeyError as k:
+        print(f"key 가 틀렸습니다. : {k}")
+    except Exception as e:
+        print(f"기타 에러 발생 : {e}")
 
+    try:    
         # 데이터프레임 변환
         df_workout = pd.DataFrame(workouts)
         df_hr = pd.DataFrame(heart_rates)
@@ -92,7 +99,7 @@ def convert_xml():
         workout_cols = ["sourceName", "sourceVersion", "device", "durationUnit", "creationDate"]
         hr_cols = ["sourceName"]
 
-        # 2. 운동 세션 정제 (타임존 정보가 포함된 시간을 판다스 시간 객체로 변환)
+        # 3. 운동 세션 정제 (타임존 정보가 포함된 시간을 판다스 시간 객체로 변환)
         if not df_workout.empty:
             df_workout["startDate"] = pd.to_datetime(df_workout["startDate"], errors='coerce')
             df_workout["endDate"] = pd.to_datetime(df_workout["endDate"], errors='coerce')
@@ -112,10 +119,10 @@ def convert_xml():
             print("=== Workout ===")
             df_workout.to_csv("./static/data/apple_health_export/workout.csv", index=False, encoding="utf-8-sig")
 
-        # 3. 상세 심박수 정제 
+        # 4. 상세 심박수 정제 
         if not df_hr.empty:
-            df_hr['timestamp'] = pd.to_datetime(df_hr['timestamp'], errors='coerce')
-            df_hr['date'] = df_hr['timestamp'].dt.date
+            df_hr['startDate'] = pd.to_datetime(df_hr['startDate'], errors='coerce')
+            df_hr['date'] = df_hr['startDate'].dt.date
             df_hr = df_hr.drop(columns=hr_cols, errors='ignore')
             print("=== HeartRate ===")
             df_hr.to_csv("./static/data/apple_health_export/hr.csv", index=False, encoding="utf-8-sig")
@@ -124,10 +131,11 @@ def convert_xml():
 
         print("✅ 모든 날짜/시간 컬럼이 성공적으로 정제되었습니다.")
         print(f"Workout 행수: {len(df_workout)} | HR 행수: {len(df_hr)}")
-    except FileNotFoundError as f:
-        print(f"파일을 찾지 못했습니다 : {f}")
-    # except Exception as e:
-    #     print(f"기타 에러 발생 : {e}")
+    
+    except KeyError as k:
+        print(f"key 가 틀렸습니다. : {k}")
+    except Exception as e:
+        print(f"기타 에러 발생 : {e}")
 
     return {"result": result}
 

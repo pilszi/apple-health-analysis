@@ -11,7 +11,7 @@ def PreProcess():
     try:
         df_workout = pd.read_csv(f"{file_path}/workout.csv")
         df_hr = pd.read_csv(f"{file_path}/hr.csv")
-        # 이상치 제거
+        # 이상치 제거 (기초대사량 이상치 제거) - Walking 운동 중 이상치 발견
         df_workout = df_workout[df_workout["BasalEnergyBurned"] < 2000]
         df_li = [(df_workout, "workout"), (df_hr, "hr")]
         for df, filename in df_li:
