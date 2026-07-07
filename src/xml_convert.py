@@ -110,8 +110,8 @@ def convert_xml():
             ].str.replace("HKWorkoutActivityType", "", regex=False)
             # 온도, 습도 컬럼 None 값 근처 날짜(전날과 다음날) 값을 활용해 채우기
             df_workout = df_workout.sort_values("startDate")
-            df_workout["Temperature"] = df_workout["Temperature"].interpolate(method="linear").round(1)
-            df_workout["Humidity"] = df_workout["Humidity"].interpolate(method="linear").round(1)
+            df_workout["Temperature"] = df_workout["Temperature"].interpolate(method="linear", limit_direction='both').round(1)
+            df_workout["Humidity"] = df_workout["Humidity"].interpolate(method="linear", limit_direction='both').round(1)
             # workoutActivityType 컬럼 값 불필요한 반복 단어 제거
             df_workout["workoutActivityType"] = df_workout["workoutActivityType"].str.replace("HKWorkoutActivityType", "", regex=False)
             # 데이터프레임 별 불필요한 컬럼 제거
