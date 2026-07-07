@@ -50,22 +50,22 @@ def convert_xml():
                             if meta_key == "HKWeatherTemperature":
                                 key_value = child.attrib.get("value")
                                 if key_value:
-                                    # workout_data["Temperature"] = float(key_value)
-                                    workout_data['Temperature'] = workout_data['Temperature'].astype(str).str.replace(r'[^-0-9.]', '', regex=True)
+                                    value = "".join(v for v in key_value if v.isdigit() or v in ['.', '-'])
+                                    # 화씨로 저장된 온도 섭씨로 변환
+                                    workout_data["Temperature"] = (float(value) - 32) / 1.8
                                 else:
-                                    # workout_data['Temperature'] = float(workout_data['Temperature']).interpolate(method='linear')
-                                    workout_data['Temperature'] = ""
+                                    workout_data["Temperature"] = None
 
                             elif meta_key ==  "HKWeatherHumidity":
                                 key_value = child.attrib.get("value")
                                 if key_value:
-                                    # workout_data["Humidity"] = float(key_value)
-                                    workout_data['Humidity'] = workout_data['Humidity'].astype(str).str.replace(r'[^-0-9.]', '', regex=True)
+                                    value = "".join(v for v in key_value if v.isdigit() or v in ['.', '-'])
+                                    # 저장된 습도 값은 5600 %  같이 100이 곱해진 값
+                                    workout_data["Humidity"] = float(value) / 100
                                 else:
-                                    #  workout_data['Humidity'] = float(workout_data['Humidity']).interpolate(method='linear')
-                                     workout_data['Humidity'] = ""
-                    
+                                    workout_data["Humidity"] = None
                     # 가공된 딕셔너리를 기존 바구니에 담기
+
                     workouts.append(workout_data)
                 elem.clear()
                 # print("=== Workout 발견 ===")
@@ -94,27 +94,31 @@ def convert_xml():
 
         # 2. 운동 세션 정제 (타임존 정보가 포함된 시간을 판다스 시간 객체로 변환)
         if not df_workout.empty:
-            df_workout['startDate'] = pd.to_datetime(df_workout['startDate'], errors='coerce')
-            df_workout['endDate'] = pd.to_datetime(df_workout['endDate'], errors='coerce')
-            df_workout['date'] = df_workout['startDate'].dt.date  # 조인용 Key 컬럼 생성
+            df_workout["startDate"] = pd.to_datetime(df_workout["startDate"], errors='coerce')
+            df_workout["endDate"] = pd.to_datetime(df_workout["endDate"], errors='coerce')
+            df_workout["date"] = df_workout["startDate"].dt.date  # 조인용 Key 컬럼 생성
             # 운동 타입 불필요 단어 제거
             df_workout["workoutActivityType"] = df_workout[
                 "workoutActivityType"
             ].str.replace("HKWorkoutActivityType", "", regex=False)
+            # 온도, 습도 컬럼 None 값 근처 날짜(전날과 다음날) 값을 활용해 채우기
+            df_workout = df_workout.sort_values("startDate")
+            df_workout["Temperature"] = df_workout["Temperature"].interpolate(method="linear").round(1)
+            df_workout["Humidity"] = df_workout["Humidity"].interpolate(method="linear").round(1)
             # workoutActivityType 컬럼 값 불필요한 반복 단어 제거
             df_workout["workoutActivityType"] = df_workout["workoutActivityType"].str.replace("HKWorkoutActivityType", "", regex=False)
             # 데이터프레임 별 불필요한 컬럼 제거
-            df_workout_dr = df_workout.drop(columns=workout_cols, errors='ignore')
+            df_workout = df_workout.drop(columns=workout_cols, errors='ignore')
             print("=== Workout ===")
-            df_workout_dr.to_csv("./static/data/apple_health_export/workout.csv", index=False, encoding="utf-8-sig")
+            df_workout.to_csv("./static/data/apple_health_export/workout.csv", index=False, encoding="utf-8-sig")
 
-        # 3. 상세 심박수 정제
+        # 3. 상세 심박수 정제 
         if not df_hr.empty:
             df_hr['timestamp'] = pd.to_datetime(df_hr['timestamp'], errors='coerce')
             df_hr['date'] = df_hr['timestamp'].dt.date
-            df_hr_dr = df_hr.drop(columns=hr_cols, errors='ignore')
+            df_hr = df_hr.drop(columns=hr_cols, errors='ignore')
             print("=== HeartRate ===")
-            df_hr_dr.to_csv("./static/data/apple_health_export/hr.csv", index=False, encoding="utf-8-sig")
+            df_hr.to_csv("./static/data/apple_health_export/hr.csv", index=False, encoding="utf-8-sig")
         
         result = 1
 

@@ -7,6 +7,7 @@ __pycache__/
 static/data/apple_health_export/
 data/
 static/img
+static/model/
 
 # VSCode
 .vscode/

@@ -14,10 +14,8 @@ def index():
 @app.route('/trigger-convert', methods=['get'])
 def trigger_convert():
     try:
-
-        
         # Flask에서 FastAPI로 요청 전달
-        response = requests.get(f"{fastapi_path}/run-script")
+        response = requests.get(f"{fastapi_path}/convert")
         fastapi_result = response.json()
         
         # FastAPI의 결과를 브라우저로 다시 전달

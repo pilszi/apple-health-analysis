@@ -60,8 +60,7 @@ def ml_train(x_train, x_test, y_train, y_test):
     res = 0
     result = []
     try:
-        # 과적합 / 과소적합 구분
-        for i in [5, 7]:
+        for i in range(5, 15):
             model = RandomForestRegressor(random_state=42, max_depth=i)
             # 1. 모델 학습 및 테스트
             model.fit(x_train, y_train)

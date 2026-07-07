@@ -5,7 +5,7 @@ from src.xml_convert import convert_xml
 from src.final_pre import pre_ml_data
 from src.corr import correlation_df
 from src.train_test import ml_train_test_split, ml_train
-from src.predict import predict_calories, model_5, cols, encoder
+from src.predict import predict_calories, model_5, cols, encoder, model_6, model_7, model_8, model_9, model_10, model_11, model_12, model_13, model_14
 
 app = FastAPI()
 
@@ -59,5 +59,7 @@ def predict(data:dict):
     """
         학습된 모델에 데이터 예측
     """
-    result = predict_calories(avg_hr=data["avg_hr"], workout=data["workout"], duration=data["duration"], model=model_5, cols=cols, encoder=encoder)
+    for i in range(5, 15):
+        model = globals().get(f"model_{i}")
+        result = predict_calories(avg_hr=data["avg_hr"], workout=data["workout"], duration=data["duration"], model=model, cols=cols, encoder=encoder)
     return {"result": result}
