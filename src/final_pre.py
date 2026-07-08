@@ -86,4 +86,3 @@ def pre_ml_data():
         print(f"파일을 찾지 못했습니다 : {f}")
     return result
 
-pre_ml_data()

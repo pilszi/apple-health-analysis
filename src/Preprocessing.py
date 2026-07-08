@@ -80,7 +80,7 @@ def PreProcess():
             print(df_workout.duplicated().sum())
             if df_workout.duplicated().sum() > 0:
                 df_workout.drop_duplicates(inplace=True, keep='first')
-            print("="*60)
+            df_workout.to_csv(f"{file_path}/workout_pre.csv", index=False, encoding="utf-8-sig")
             print(f"==== workout_pre.csv 생성/ 행 : {len(df_workout)} ====")
             
         except KeyError as k:
@@ -92,9 +92,9 @@ def PreProcess():
 
         # 심박수 데이터 전처리 - 전체 심박수 중 운동 중 심박수만 남기고 모두 제거
         try:
-            df_hr['startDate'] = pd.to_datetime(df_hr['startDate'], format='mixed', errors='coerce')
-            df_workout['startDate'] = pd.to_datetime(df_workout['startDate'], format='mixed', errors='coerce')
-            df_workout['endDate'] = pd.to_datetime(df_workout['endDate'], format='mixed', errors='coerce')
+            df_hr['startDate'] = pd.to_datetime(df_hr['startDate'], format='mixed', errors='coerce').dt.tz_localize(None)
+            df_workout['startDate'] = pd.to_datetime(df_workout['startDate'], format='mixed', errors='coerce').dt.tz_localize(None)
+            df_workout['endDate'] = pd.to_datetime(df_workout['endDate'], format='mixed', errors='coerce').dt.tz_localize(None)
 
             hr_li = []
             for idx, workout in df_workout.iterrows():
@@ -103,6 +103,7 @@ def PreProcess():
                 match_hr = df_hr[df_hr['startDate'].between(start, end)]
                 hr_li.append(match_hr)
             df_hr_workout = pd.concat(hr_li).drop_duplicates().sort_values('startDate')
+            df_hr_workout.to_csv(f"{file_path}/hr_pre.csv", index=False, encoding="utf-8-sig")
             print(f"==== hr_pre.csv 생성/ 행 : {len(df_hr_workout)} ====")
         except KeyError as k:
             print(f"key 가 틀렸습니다. : {k}")
