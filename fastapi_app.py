@@ -59,7 +59,10 @@ def predict(data:dict):
     """
         학습된 모델에 데이터 예측
     """
+    res_dict = {}
     for i in range(5, 15):
         model = globals().get(f"model_{i}")
         result = predict_calories(avg_hr=data["avg_hr"], workout=data["workout"], duration=data["duration"], model=model, cols=cols, encoder=encoder)
-    return {"result": result}
+        res_dict[f'{result["model"]}'] = result["result"]
+    
+    return {"result": res_dict}

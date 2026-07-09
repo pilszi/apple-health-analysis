@@ -27,23 +27,31 @@ hr_ratio_type = {
     'Walking': {'max': 1.0915, 'min': 0.9212}
 }
 
-def predict_calories(model, encoder, cols, avg_hr, workout, duration):
+def predict_calories(model, encoder, cols, data):
+    """
+        학습된 모델을 활용한 소모 칼로리 예측 함수
+        data : {
+            "workout": 운동타입,
+            "duration": 운동시간,
+            "workout_avg_hr": 운동 중 평균 심박수
+        }
+    """
 
-    max_ratio = hr_ratio_type[workout]['max']
-    min_ratio = hr_ratio_type[workout]['min']
+    max_ratio = hr_ratio_type[data['workout']]['max']
+    min_ratio = hr_ratio_type[data['workout']]['min']
 
-    max_hr = avg_hr * max_ratio
-    min_hr = avg_hr * min_ratio
-    training_load = avg_hr * duration
+    max_hr = data['workout_avg_hr'] * max_ratio
+    min_hr = data['workout_avg_hr'] * min_ratio
+    training_load = data['workout_avg_hr'] * data['duration']
 
     num_data = {
-        "duration": [duration],
-        "workout_avg_hr": [avg_hr],
+        "duration": [data['duration']],
+        "workout_avg_hr": [data['workout_avg_hr']],
         "workout_max_hr": [max_hr],
         "workout_min_hr": [min_hr],
         "training_load": [training_load]
     }
-    cat_data = {"workoutActivityType": [workout]}
+    cat_data = {"workoutActivityType": [data['workout']]}
 
     df_num = pd.DataFrame(num_data)
     df_cat = pd.DataFrame(cat_data)
@@ -56,9 +64,16 @@ def predict_calories(model, encoder, cols, avg_hr, workout, duration):
     df_final = df_final.reindex(columns=cols, fill_value=0)
 
     result = model.predict(df_final)[0]
+    res_dict = {
+        "model": model,
+        "workout": data['workout'],
+        "max_hr": max_hr,
+        "min_hr": min_hr,
+        "result": f"{result:.2f}"
+    }
     print(f" === {model} === ")
-    print(f" === 운동타입 : {workout} === ")
+    print(f" === 운동타입 : {data['workout']} === ")
     print(f" === 예상 Max HR : {max_hr:.2f} === ")
     print(f" === 예상 Min HR : {min_hr:.2f} === ")
     print(f" === 총 소모칼로리 예측 결과 : {result:.2f} === ")
-    return f"{result:.2f}"
+    return res_dict
