@@ -14,7 +14,7 @@ def convert_xml():
         result = 0  
         context = ET.iterparse(file_path, events=("end",))
         try:
-            print(f"⏳ [Apple Watch] 데이터만 필터링하여 스캔 시작...")
+            print(f"[Apple Watch] 데이터만 필터링하여 스캔 시작...")
             for event, elem in context:
 
                 # 1. 운동 세션 추출 (지정한 애플워치 기록만)
@@ -106,6 +106,7 @@ def convert_xml():
                 df_workout["startDate"] = pd.to_datetime(df_workout["startDate"], format='mixed', errors='coerce').dt.tz_localize(None)
                 df_workout["endDate"] = pd.to_datetime(df_workout["endDate"], format='mixed', errors='coerce').dt.tz_localize(None)
                 df_workout["date"] = df_workout["startDate"].dt.date
+                df_workout['duration'] = df_workout['duration'].astype(float).round(3)
                 # 운동 타입 불필요 단어 제거
                 df_workout["workoutActivityType"] = df_workout[
                     "workoutActivityType"
@@ -122,6 +123,7 @@ def convert_xml():
             if not df_hr.empty:
                 df_hr['startDate'] = pd.to_datetime(df_hr['startDate'], format='mixed', errors='coerce').dt.tz_localize(None)
                 df_hr['date'] = df_hr['startDate'].dt.date
+                df_hr['heart_rate'] = df_hr['heart_rate'].astype(float).round(3)
                 df_hr = df_hr.drop(columns=hr_cols, errors='ignore')
                 print("=== HeartRate ===")
                 df_hr.to_csv("./static/data/apple_health_export/hr.csv", index=False, encoding="utf-8-sig")

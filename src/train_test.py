@@ -9,36 +9,46 @@ from sklearn.metrics import r2_score
 import matplotlib.pyplot as plt
 from sklearn.metrics import mean_absolute_error
 import joblib
+from db import con
 
 
 def ml_train_test_split():
     encoder = OneHotEncoder(drop='first', handle_unknown='ignore', sparse_output=False)
 
-    file_path = f'./static/data/apple_health_export'
-    df = pd.read_csv(f'{file_path}/workout_hr.csv')
-
-    # print(df_workout_hr.columns)
+    # file_path = f'./static/data/apple_health_export'
+    # df = pd.read_csv(f'{file_path}/workout_hr.csv')
+    conn = con()
+    sql = """ 
+        SELECT workout_date, workoutactivitytype, duration, 
+                workout_avg_hr, workout_max_hr, workout_min_hr, 
+                training_load, totalenergyburned
+        FROM apple_health
+    """
+    df = pd.read_sql(sql, conn)
+    print(f"==== {len(df)}건의 데이터를 성공적으로 불러왔습니다 ====")
+    df.columns = df.columns.str.lower()
+    print(df.columns)
     #'workoutActivityType', 'duration', 'date', 'workout_avg_hr', 'workout_max_hr', 'workout_min_hr', 'TotalEnergyBurned', 'hr_variability', 'hr_sustain_ratio', 'training_load', 'calories_per_min'
 
     # 1. 독립변수 조정
-    x = df[['workoutActivityType', 'duration', 'workout_avg_hr', 'workout_max_hr', 'workout_min_hr', 'training_load']]
+    x = df[['workoutactivitytype', 'duration', 'workout_avg_hr', 'workout_max_hr', 'workout_min_hr', 'training_load']]
 
     # 2. 종속변수
-    y = df['TotalEnergyBurned']
+    y = df['totalenergyburned']
 
     # 3. 훈련, 시험 데이터 분리
     x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.3, random_state=42, shuffle=True)
 
     # 4. 범주형 데이터 수치형으로 인코딩
-    x_train_cat = encoder.fit_transform(x_train[['workoutActivityType']])
-    x_test_cat = encoder.transform(x_test[['workoutActivityType']])
+    x_train_cat = encoder.fit_transform(x_train[['workoutactivitytype']])
+    x_test_cat = encoder.transform(x_test[['workoutactivitytype']])
 
     # 5. 수치형 데이터 지정
-    x_train_num = x_train.drop(columns="workoutActivityType")
-    x_test_num = x_test.drop(columns="workoutActivityType")
+    x_train_num = x_train.drop(columns="workoutactivitytype")
+    x_test_num = x_test.drop(columns="workoutactivitytype")
 
     # 6. 범주형 데이터 항목 이름
-    cols = encoder.get_feature_names_out(['workoutActivityType'])
+    cols = encoder.get_feature_names_out(['workoutactivitytype'])
 
     # 7. 인코딩 한 범주형 데이터 데이터프레임 변경
     x_train_cat_df = pd.DataFrame(x_train_cat, columns= cols, index= x_train.index)

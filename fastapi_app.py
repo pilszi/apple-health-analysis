@@ -6,6 +6,7 @@ from src.final_pre import pre_ml_data
 from src.corr import correlation_df
 from src.train_test import ml_train_test_split, ml_train
 from src.predict import predict_calories, model_5, cols, encoder, model_6, model_7, model_8, model_9, model_10, model_11, model_12, model_13, model_14
+from db import insert_oracle
 
 app = FastAPI()
 
@@ -66,3 +67,8 @@ def predict(data:dict):
         res_dict[f'{result["model"]}'] = result["result"]
     
     return {"result": res_dict}
+
+@app.post('/db')
+def db(data:dict):
+    insert_oracle(data)
+    return 'OK!'

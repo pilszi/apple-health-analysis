@@ -1,4 +1,5 @@
 import pandas as pd
+from db import insert_oracle
 
 def pre_ml_data():
     """
@@ -61,22 +62,26 @@ def pre_ml_data():
             ).drop(columns=['workout_idx']) # 임시 키 제거
 
             # 4. 독립변수 추가
-            df_workout_hr_merge["TotalEnergyBurned"] = (df_workout_hr_merge["ActiveEnergyBurned"].astype(float) + df_workout_hr_merge["BasalEnergyBurned"].astype(float))     # 활동 소모 칼로리 + 기초 대사 소모 칼로리
-            df_workout_hr_merge['hr_variability'] = (df_workout_hr_merge['workout_max_hr'].astype(float) - df_workout_hr_merge['workout_min_hr'].astype(float))               # 안정성 및 인터벌 강도
-            df_workout_hr_merge['hr_sustain_ratio'] = (df_workout_hr_merge['workout_avg_hr'].astype(float) / df_workout_hr_merge['workout_max_hr'].astype(float))             # 운동 지속성 및 유지력
+            df_workout_hr_merge["totalenergyburned"] = (df_workout_hr_merge["ActiveEnergyBurned"].astype(float) + df_workout_hr_merge["BasalEnergyBurned"].astype(float))     # 활동 소모 칼로리 + 기초 대사 소모 칼로리
+            df_workout_hr_merge["totalenergyburned"] = df_workout_hr_merge["totalenergyburned"].round(3)
+            df_workout_hr_merge["hr_variability"] = (df_workout_hr_merge['workout_max_hr'].astype(float) - df_workout_hr_merge['workout_min_hr'].astype(float))               # 안정성 및 인터벌 강도
+            df_workout_hr_merge["hr_sustain_ratio"] = (df_workout_hr_merge['workout_avg_hr'].astype(float) / df_workout_hr_merge['workout_max_hr'].astype(float))             # 운동 지속성 및 유지력
             df_workout_hr_merge["training_load"] = (df_workout_hr_merge["duration"].astype(float) * df_workout_hr_merge["workout_avg_hr"].astype(float))                      # 운동 총량 지표
-            df_workout_hr_merge["calories_per_min"] = (df_workout_hr_merge["TotalEnergyBurned"].astype(float) / df_workout_hr_merge["duration"].astype(float))                # 분당 소모 칼로리
+            df_workout_hr_merge["training_load"] = df_workout_hr_merge["training_load"].round(3)
+            df_workout_hr_merge["calories_per_min"] = (df_workout_hr_merge["totalenergyburned"].astype(float) / df_workout_hr_merge["duration"].astype(float))                # 분당 소모 칼로리
 
             # 5. 분석 및 원-핫 인코딩 단계에서 제외할 컬럼 정의
             drop_cols = ["startDate", "endDate", "ActiveEnergyBurned", "BasalEnergyBurned", "y_pred", "error"]
             df_workout_hr_merge = df_workout_hr_merge.drop(columns=drop_cols, errors="ignore")
 
+            # insert_oracle(df_workout_hr_merge)
             df_workout_hr_merge.to_csv(f"{file_path}/workout_hr.csv", index=False, encoding="utf-8-sig")
             print('==== 최종 데이터 완성 ====')
+            print(f"==== 최종 데이터 갯수: {len(df_workout_hr_merge)} ==== ")
             result = 1
         
-        except KeyError as k:
-            print(f"key 에러 발생 : {k}")
+        # except KeyError as k:
+        #     print(f"key 에러 발생 : {k}")
         except SyntaxError as s:
             print(f"문법 오류 : {s}")
         # except Exception as e:
